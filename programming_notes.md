@@ -1,7 +1,7 @@
 # Programming Notes for the Job Sort Program
 
 
-## **Task:**
+## **Task:** -COMPLETED
 
 * In **Data** tab, add Duration column (col U). The Duration to be the difference between the Complete and Start dates. Code this as a subroutine that is called after each update.
 
