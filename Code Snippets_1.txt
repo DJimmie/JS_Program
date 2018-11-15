@@ -1,0 +1,250 @@
+DATE_REPORTED = CDate(Format(Me.DATE_OPENED))
+
+
+DATE_REPORTED = a & Format(DATE_REPORTED, "yyyy-mm-dd") & a
+DATE_CLOSED = a & Format(DATE_CLOSED, "yyyy-mm-dd") & a
+DATE_UPDATED = a & Format(DATE_UPDATED, "yyyy-mm-dd") & a
+
+--------------------------------------------------------------------------------
+
+' OPEN RECORDSET
+rst.Open strSQL, conn, 1, 1
+
+' OUTPUT TO WORKSHEET
+Worksheets("Report_2").Range("A4").CopyFromRecordset rst
+
+rst.Close
+
+' FREE RESOURCES
+Set rst = Nothing
+Set conn = Nothing
+
+
+
+----------------------------------------------------------------------------
+
+With Application
+    Me.Top = .Top
+    Me.Left = .Left
+    Me.Height = .Height
+    Me.Width = .Width
+End With
+
+
+
+Need_Date, All_Material_Available, Pulling_Material, Assembly, Testing,Disassembly, Close_Out
+
+
+----------------------------------------------------------------------------------
+
+
+Sub get_list()
+
+Dim conn As Object, rst As Object
+Dim strSQL As String
+
+Set conn = CreateObject("ADODB.Connection")
+Set rst = CreateObject("ADODB.Recordset")
+
+On Error GoTo No_Server_Available
+
+' OPEN CONNECTION
+conn.Open "DRIVER=SQLite3 ODBC Driver;Database=\\camradfs01.ccc.coopcam.com\testlab_i\CTDC_Systems\HCTC_EMR_CSP_database\emr_database.db"
+'conn.Open "DRIVER=SQLite3 ODBC Driver;Database=J:\Jim Dowd\SQLite_test\emr_database.db"
+
+
+strSQL = "SELECT DISTINCT SUPPLIER FROM csp_table_1 order by SUPPLIER asc;"
+' OPEN RECORDSET
+rst.Open strSQL, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("F2").CopyFromRecordset rst
+rst.Close
+
+strSQL_1 = "SELECT DISTINCT MANUFACTURER FROM csp_table_1 order by MANUFACTURER asc;"
+rst.Open strSQL_1, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("E2").CopyFromRecordset rst
+rst.Close
+
+strSQL_2 = "SELECT DISTINCT WHERE_STORED FROM csp_table_1 order by WHERE_STORED asc;"
+rst.Open strSQL_2, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("H2").CopyFromRecordset rst
+rst.Close
+
+strSQL_3 = "SELECT DISTINCT LOCATION FROM csp_table_1 order by LOCATION asc;"
+rst.Open strSQL_3, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("G2").CopyFromRecordset rst
+rst.Close
+
+strSQL_4 = "SELECT DISTINCT HCTC_ID FROM csp_table_1 order by HCTC_ID asc;"
+rst.Open strSQL_4, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("B2").CopyFromRecordset rst
+rst.Close
+
+strSQL_5 = "SELECT DISTINCT ENTERED_BY FROM csp_table_1 order by ENTERED_BY asc;"
+rst.Open strSQL_5, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("A2").CopyFromRecordset rst
+rst.Close
+
+strSQL_6 = "SELECT TECHNOLOGY FROM csp_technology_list order by TECHNOLOGY asc;"
+rst.Open strSQL_6, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("I2").CopyFromRecordset rst
+rst.Close
+
+strSQL_7 = "SELECT NAME FROM emr_data_4 WHERE ASSOCIATION='Buyer' ORDER by NAME asc;"
+rst.Open strSQL_7, conn, 1, 1
+' OUTPUT TO WORKSHEET
+Worksheets("List").Range("L2").CopyFromRecordset rst
+rst.Close
+
+
+' FREE RESOURCES
+Set rst = Nothing
+Set conn = Nothing
+
+Exit Sub
+
+
+
+
+
+No_Server_Available:
+    MsgBox "The Server is currently unavailable or you do not have the SQLite ODBC driver. Try again later or verify you have the ODBC driver installed on your PC."
+    'Exit Sub
+    Application.Visible = True
+    'ThisWorkbook.Close savechanges:=False
+
+End Sub
+
+
+
+
+-------------------------------------------------------------------------------------------------------
+
+
+Sub UPDATE_CSP()
+
+Dim RowCount As Integer
+Dim lastRow As Integer
+Dim lastRow2 As Integer
+Dim CSP_FILE As String
+Dim HCTC_ID, MODEL_NUMBER, SERIAL_NUMBER, MANUFACTURER, SUPPLIER, DESCRIPTION, LOCATION, WHERE_STORED, CURRENT_QTY, REQUIRED_QTY, MOST_RECENT_QUOTE, INVENTORY_DATE, ENTERED_BY, EQUIPMENT_CLASSIFICATION, COMMENTS, COST As String
+
+Sheets("CSP_Data").Activate
+lastRow = Sheets("CSP_Data").Application.WorksheetFunction.CountA(Range("B:B"))
+lastRow = lastRow + 1
+'MsgBox lastRow
+
+a = "'"
+HCTC_ID = a & CSP_ADD.csp_hctc_id & a
+MODEL_NUMBER = a & CSP_ADD.csp_model_num & a
+SERIAL_NUMBER = a & CSP_ADD.csp_serial_num & a
+MANUFACTURER = a & CSP_ADD.csp_mfr & a
+SUPPLIER = a & CSP_ADD.csp_supplier & a
+DESCRIPTION = a & CSP_ADD.csp_describe & a
+LOCATION = a & CSP_ADD.csp_where_used & a
+WHERE_STORED = a & CSP_ADD.csp_storage & a
+CURRENT_QTY = CInt(CSP_ADD.csp_current_qty)
+REQUIRED_QTY = CInt(CSP_ADD.csp_qty)
+MOST_RECENT_QUOTE = CDbl(CSP_ADD.csp_quote)
+INVENTORY_DATE = Date
+INVENTORY_DATE = a & Format(INVENTORY_DATE, "yyyy-mm-dd") & a
+ENTERED_BY = a & CSP_ADD.csp_sys_personnel & a
+EQUIPMENT_CLASSIFICATION = a & CSP_ADD.csp_technology & a
+COMMENTS = a & CSP_ADD.CSP_Notes & a
+COST = 0
+
+CSP_ADD.add_notice.Visible = True
+
+If CSP_ADD.csp_sys_personnel = "" Then
+    MsgBox "ENTER YOUR NAME IN THE FIELD", vbExclamation
+    Exit Sub
+End If
+
+
+'---UPLOAD TO DATABASE ------------------------UPLOAD TO DATABASE----------------------------------UPLOAD TO DATABASE-------------------------------
+
+
+Set conn = CreateObject("ADODB.Connection")
+Set rst = CreateObject("ADODB.Recordset")
+
+' OPEN CONNECTION
+conn.Open "DRIVER=SQLite3 ODBC Driver;Database=\\camradfs01.ccc.coopcam.com\testlab_i\CTDC_Systems\HCTC_EMR_CSP_database\emr_database.db"
+'conn.Open "DRIVER=SQLite3 ODBC Driver;Database=J:\Jim Dowd\SQLite_test\emr_database.db"
+
+cols = "HCTC_ID,MODEL_NUMBER,SERIAL_NUMBER,MANUFACTURER,SUPPLIER,DESCRIPTION,LOCATION,WHERE_STORED,CURRENT_QTY,REQUIRED_QTY,MOST_RECENT_QUOTE,INVENTORY_DATE,ENTERED_BY,EQUIPMENT_CLASSIFICATION,COMMENTS,COST"
+
+
+
+strSQL = "UPDATE csp_table_1 SET HCTC_ID =" & HCTC_ID & ", MODEL_NUMBER=" & MODEL_NUMBER & ", SERIAL_NUMBER =" & SERIAL_NUMBER & _
+", MANUFACTURER=" & MANUFACTURER & ", SUPPLIER=" & SUPPLIER & ", DESCRIPTION=" & DESCRIPTION & ", LOCATION=" & LOCATION & ", WHERE_STORED=" & WHERE_STORED & _
+", CURRENT_QTY=" & CURRENT_QTY & ", REQUIRED_QTY=" & REQUIRED_QTY & ", MOST_RECENT_QUOTE=" & MOST_RECENT_QUOTE & ", INVENTORY_DATE=" & INVENTORY_DATE & _
+", ENTERED_BY=" & ENTERED_BY & ", EQUIPMENT_CLASSIFICATION=" & EQUIPMENT_CLASSIFICATION & _
+", COMMENTS=" & COMMENTS & ", COST=" & COST & " WHERE MODEL_NUMBER =" & MODEL_NUMBER
+
+
+'diagnostics
+Sheets("dump").Cells(1, 1) = cols
+Sheets("dump").Cells(2, 1) = strSQL
+
+
+' OPEN RECORDSET
+rst.Open strSQL, conn, 1, 1
+
+
+' FREE RESOURCES
+Set rst = Nothing
+Set conn = Nothing
+
+
+End Sub
+
+
+---------------------------------------------------------------------------------------------
+a = "'"
+Test_Plan = a & UserForm2.TPN & a
+TDCSR = a & UserForm2.TDCSR & a
+Time_Card = a & UserForm2.CATSNUM & a
+Project_Test = a & UserForm2.TPTITLE & a
+Engineer = a & UserForm2.ELIST & a
+The_Group = a & UserForm2.Group & a
+Last_Updated_by = a & "Jim" & a
+Latest_Update = Date
+Test_Area = a & UserForm2.TESTAREA & a
+Special_Equipment = a & UserForm2.SPEQUIP & a
+Start_Date = CDate(Format(UserForm2.StartDate))
+Complete = CDate(Format(UserForm2.StopDate))
+Primary_Technician = a & UserForm2.LABTECH & a
+Back_up_Technician = a & UserForm2.SECTECH & a
+Work_Order_Number = a & UserForm2.WORKORDER & a
+Test_Phase = a & UserForm2.PHASE & a
+Group_Priority = a & UserForm2.PRIORITY.Value & a
+Test_Article_Disposition = a & UserForm2.DISPOSITION & a
+Routing_Number = a & UserForm2.ROUTING_NUM & a
+Acceptance_Criteria = a & "TBD" & a
+Duration = Complete - Start_Date
+Technology = a & UserForm2.Technology & a
+
+need_date = CDate(Format(UserForm2.need_date))
+
+All_Material_Available = Date
+Pulling_Material = Date
+Pre_Test = Date
+Assembly = Date
+Testing = Date
+Disassembly = Date
+Close_Out = Date
+
+Comments = a & "TBD" & a
+
+
+
+---------------------------------------------------------------------
+UPDATE tsd_table_1 SET column =UserForm3.xxx WHERE Test_PLan= UserForm3.LOOK4TP
+
+
