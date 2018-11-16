@@ -247,4 +247,40 @@ Comments = a & "TBD" & a
 ---------------------------------------------------------------------
 UPDATE tsd_table_1 SET column =UserForm3.xxx WHERE Test_PLan= UserForm3.LOOK4TP
 
+------------------------------------------------------------------------
+
+Test_Plan
+TDCSR
+Time_Card
+Project_Test
+Engineer
+Group
+Last_Updated_by
+Latest_Update
+Test_Area
+Special_Equipment
+Start
+Complete
+Primary_Technician
+Back_up_Technician
+Work_Order_Number
+Phase
+Group_Priority
+Test_Article_Disposition
+Routing_Number
+Acceptance_Criteria
+Duration
+Technology
+Need_Date
+All_Material_Available
+Pulling_Material
+Pre_Test
+Assembly
+Bay_Location
+Comments
+Testing
+Disassembly
+Close_Out
+
+
 
