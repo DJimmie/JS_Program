@@ -1,0 +1,106 @@
+Private Sub ENGINEERS_Change()
+
+Dim lastRow As Integer
+Dim RowCount As Integer
+
+
+NOTSUB_TP.Clear
+AWA_TP.Clear
+P_TP.Clear
+C_TP.Clear
+FINISHED_TP.Clear
+STB_TP.Clear
+
+
+
+
+Sheets("Data").Activate
+lastRow = Sheets("Data").Application.WorksheetFunction.CountA(Range("A:A"))
+
+'MsgBox LastRow
+'MsgBox Date
+ 
+ 
+group_name = ENGINEERS.Text
+
+
+For RowCount = 2 To lastRow
+
+'Condition for the NYS Test Plans
+
+    If Sheets("Data").Cells(RowCount, 5) = group_name And Cells(RowCount, 16) = "NYS" Then
+    
+        NOTSUB_TP.AddItem (Sheets("Data").Cells(RowCount, 1))
+        
+        
+    End If
+    
+    
+ 'Condition for the Test Plans Awaiting Approval
+ 
+    If Sheets("Data").Cells(RowCount, 5) = group_name And Sheets("Data").Cells(RowCount, 16) = "Awaiting Approval" Then
+    
+        AWA_TP.AddItem (Sheets("Data").Cells(RowCount, 1) & vbTab & "Test Starts on  " & Cells(RowCount, 11))
+        
+        
+    End If
+       
+    
+    
+'Condition for the Pending Test Plans
+
+    If Sheets("Data").Cells(RowCount, 5) = group_name And Cells(RowCount, 16) = "Pending" Then
+    
+        P_TP.AddItem (Sheets("Data").Cells(RowCount, 1) & vbTab & "Test Starts on  " & Cells(RowCount, 11))
+        
+        
+    End If
+    
+    
+    
+
+'Condition for the Test Plans ON STANDBY
+
+    If Sheets("Data").Cells(RowCount, 5) = group_name And Cells(RowCount, 16) = "On Standby" Then
+    
+        STB_TP.AddItem (Sheets("Data").Cells(RowCount, 1) & vbTab & "for " & Cells(RowCount, 9))
+        
+        
+    End If
+
+
+
+'Condition for the Current Test Plans
+
+    If Sheets("Data").Cells(RowCount, 5) = group_name And Cells(RowCount, 16) = "Current" Then
+    
+        C_TP.AddItem (Sheets("Data").Cells(RowCount, 1) & Space$(10) & "End Date:" & Space$(2) & Cells(RowCount, 12))
+        
+        
+    End If
+
+
+
+'Condition for the Completed Test Plans (within the last 3 months)
+
+
+If Sheets("Data").Cells(RowCount, 5) = group_name And Cells(RowCount, 12) <> "TBA" Then
+
+    If Date - (Sheets("Data").Cells(RowCount, 12)) >= 0 And Date - (Sheets("Data").Cells(RowCount, 12)) <= 90 And Cells(RowCount, 16) = "Complete" Then
+        
+        FINISHED_TP.AddItem (Sheets("Data").Cells(RowCount, 1) & vbTab & Space$(10) & "Completed on:" & vbTab & vbTab & Cells(RowCount, 12))
+        
+        
+    End If
+
+End If
+
+
+Next RowCount
+
+
+
+End Sub
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
