@@ -104,3 +104,37 @@ End Sub
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Sub row_hgt()
+'***(11-20-2018) This code adjust row heights based on the content of a cell.
+
+Dim Rng As Range
+Dim Cel As Range
+
+Set Rng = Range("A1:A12")
+
+
+'Rng.Select
+
+For Each Cel In Rng
+    If IsEmpty(Cel) Then
+        Cel.RowHeight = 5
+    End If
+Next Cel
+
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
